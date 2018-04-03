@@ -13,7 +13,8 @@ save_list = []
 
 def start(bot, update):
     bot.send_message(chat_id=update.message.chat_id,
-                     text='Hi, {}! Use /help command to get info, /solve to solve a task:'.format(update.effective_user.first_name))
+                     text='Hi, {}! Use /help command to get info, /solve to solve a task:'.format(
+                         update.effective_user.first_name))
 
 
 def solve(bot, update):
@@ -43,26 +44,6 @@ def stop(bot, update):
     updater.stop()
 
 
-#
-# def caps(bot, update, args):
-#     text_caps = ' '.join(args).upper()
-#     bot.send_message(chat_id=update.message.chat_id, text=text_caps)
-#
-#
-# def inline_caps(bot, update):
-#     query = update.inline_query.query
-#     if not query:
-#         return
-#     results = list()
-#     results.append(
-#         InlineQueryResultArticle(
-#             id=query.upper(),
-#             title='Caps',
-#             input_message_content=InputTextMessageContent(query.upper())
-#         )
-#     )
-#     bot.answer_inline_query(update.inline_query.id, results)
-
 @run_async
 def main(bot, update):
     if not update.message.chat_id in save_dict.keys():
@@ -79,7 +60,7 @@ def main(bot, update):
         example.type_checker(save_dict[update.message.chat_id][-3][1], save_dict[update.message.chat_id][-1][1])[1],
         bot, update)
     save_dict[update.message.chat_id] = []
-    # save_list = []
+
 
 @run_async
 def main_function(amount, clist, bot, update):
@@ -93,44 +74,35 @@ def main_function(amount, clist, bot, update):
         solve(bot, update)
     else:
         try:
-            coinsUsed = [0] * (amount + 1)
-            coinCount = [0] * (amount + 1)
+            used_coins = [0] * (amount + 1)
+            coin_counter = [0] * (amount + 1)
 
             coins_gcd = example.pairs(clist)
             bot.send_message(chat_id=update.message.chat_id,
-                             text='The sum to reach is {}.\nGCD equals to {}.'.format(amount, coins_gcd))
-            print('The sum to reach is {}. GCD equals to {}.'.format(amount, coins_gcd))
-
+                             text='The amount of money to reach is {}.\nCommon coins GCD equals to {}.'.format(amount,
+                                                                                                                coins_gcd))
             if amount % coins_gcd == 0:
-                availability = True
                 bot.send_message(chat_id=update.message.chat_id,
-                                 text='You can reach required sum with current coins set.')
-
-                print('You can reach required sum with current coins set.')
+                                 text='You can reach amount with given coins set.')
                 bot.send_message(chat_id=update.message.chat_id,
-                                 text="Making change for {} requires {} coins.".format(amount,
-                                                                                       example.task_solver(clist,
-                                                                                                           amount,
-                                                                                                           coinCount,
-                                                                                                           coinsUsed)))
-
-                print("Making change for {} requires {} coins.".format(amount,
-                                                                       example.task_solver(clist, amount, coinCount,
-                                                                                           coinsUsed)))
-                bot.send_message(chat_id=update.message.chat_id,
-                                 text="They are: {}".format(
-                                     ', '.join(str(i) for i in example.printer(coinsUsed, amount))))
-                print("They are: {}".format(', '.join(str(i) for i in example.printer(coinsUsed, amount))))
-                print("The used list is as follows:")
-                print(coinsUsed)
+                                 text="To get {} you are need {} coins:".format(amount,
+                                                                                    example.task_solver(clist, amount,
+                                                                                                        coin_counter,
+                                                                                                        used_coins)))
+                if len(example.choose_what_we_need(used_coins, amount)) > 50:
+                    bot.send_message(chat_id=update.message.chat_id,
+                                     text="...the length of coins list is too long (more than 50)")
+                else:
+                    bot.send_message(chat_id=update.message.chat_id,
+                                     text="{}".format(
+                                         ', '.join(str(i) for i in example.choose_what_we_need(used_coins, amount))))
 
             elif amount % coins_gcd != 0:
-                availability = False
-                print('Unfortunately, you can\'t reach required amount with chosen coins set.')
                 bot.send_message(chat_id=update.message.chat_id,
                                  text='Unfortunately, you can\'t reach required amount with chosen coins set.')
-        except TypeError:
-            pass
+        except Exception as exc:
+            bot.send_message(chat_id=update.message.chat_id,
+                             text='Sorry, something went wrong {}'.format(exc))
 
 
 start_command_handler = CommandHandler('start', start)
