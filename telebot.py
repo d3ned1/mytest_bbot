@@ -84,17 +84,13 @@ def main_function(amount, clist, bot, update):
             if amount % coins_gcd == 0:
                 bot.send_message(chat_id=update.message.chat_id,
                                  text='You can reach amount with given coins set.')
-                bot.send_message(chat_id=update.message.chat_id,
-                                 text="To get {} you are need {} coins:".format(amount,
-                                                                                example.get_result(amount, clist)))
-                if len(example.choose_what_we_need(used_coins, amount)) > 50:
+                if len(example.get_result(amount, clist)) > 150:
                     bot.send_message(chat_id=update.message.chat_id,
-                                     text="...the length of coins list is too long (more than 50)")
+                                     text="...but the length of coins list is too long")
                 else:
                     bot.send_message(chat_id=update.message.chat_id,
-                                     text="{}".format(
-                                         ', '.join(str(i) for i in example.choose_what_we_need(used_coins, amount))))
-
+                                 text="To get {} you are need {} coins.".format(amount,
+                                                                                example.get_result(amount, clist)))
             elif amount % coins_gcd != 0:
                 bot.send_message(chat_id=update.message.chat_id,
                                  text='Unfortunately, you can\'t reach required amount with chosen coins set.')
