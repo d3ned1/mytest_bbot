@@ -72,7 +72,53 @@ def pairs(seq):
             return result
 
 
-def task_solver(user_coins_list, required_sum, min_amount, used):
+def task_solver(total, units, stored, min_ix=0):
+    if total < 0:
+        return []
+
+    if total == 0:
+        return [{}]
+
+    if min_ix == len(units):
+        return []
+
+    key = (total, min_ix)
+    if key in stored:
+        return stored[key]
+
+    sol_list = []
+    u = units[min_ix]
+    for c in range(total // u + 1):
+        sols = task_solver(total - c * u, units, stored, min_ix + 1)
+        for sol in sols:
+            if c > 0:
+                sol2 = sol.copy()
+                sol2[u] = c
+            else:
+                sol2 = sol
+            sol_list.append(sol2)
+
+    stored[key] = sol_list
+    return sol_list
+
+total = 12
+coins_list = [7, 3]
+
+
+def get_result(total, coins_list):
+    string = ''
+    solution = task_solver(total, coins_list, {})
+    for i, key in enumerate(solution[-1]):
+        if i + 1 < len(solution[-1].keys()) >= 2:
+            string = string + '{} of {}, '.format(solution[-1][key], key)
+        else:
+            string = string + '{} of {}'.format(solution[-1][key], key)
+    return string
+        # print('To get required amount \'{}\' you need to use: \'{}\''.format(total, string))
+
+# get_result(total, coins_list)
+
+def task_solver_(user_coins_list, required_sum, min_amount, used):
     user_coin_set = []
     for this_coin in range(required_sum + 1):
         coin_count = this_coin
@@ -124,10 +170,5 @@ def main(amount, clist):
                         ', '.join(str(i) for i in choose_what_we_need(used_coins, amount)))))
             elif amount % coins_gcd != 0 or (False in [i + j == amount for i in clist for j in clist]):
                 print('Unfortunately, you can\'t reach required amount with chosen coins set.')
-        except TypeError:
-            pass
-
-
-userlist = [10, 3]
-amount = 11
-main(amount, userlist)
+        except TypeError as type_error:
+            print(type_error)
