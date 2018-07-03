@@ -5,7 +5,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-updater = Updater(token='489974210:AAEhUWj8dS5n4JtO9nVrgqvm6VIJ6oei2h4')
+updater = Updater(token='')
 dispatcher = updater.dispatcher
 save_dict = {0: 0}
 save_list = []
